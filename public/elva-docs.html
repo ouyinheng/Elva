@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Elva 文档</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --panel: #ffffff;
+    --ink: #0b1220;
+    --ink-2: #47536b;
+    --ink-3: #7b8699;
+    --line: #e4e7ee;
+    --brand: #16b877;
+    --brand-soft: #e8f8f1;
+    --warn: #d97706;
+    --warn-soft: #fef6e7;
+    --danger: #dc2626;
+    --code-bg: #0f172a;
+    --code-ink: #e2e8f0;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.72 -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+      "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--brand); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .layout { display: flex; align-items: flex-start; max-width: 1180px; margin: 0 auto; padding: 0 24px 96px; }
+
+  /* ------------------------------- sidebar ------------------------------- */
+  aside {
+    position: sticky; top: 0; flex: 0 0 216px;
+    padding: 32px 20px 32px 0;
+    height: 100vh; overflow-y: auto;
+    font-size: 13px;
+  }
+  aside .brand { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  aside .brand b { font-size: 16px; letter-spacing: .08em; }
+  aside .ver { color: var(--ink-3); font-size: 11.5px; margin-bottom: 22px; }
+  aside nav { display: flex; flex-direction: column; gap: 1px; }
+  aside nav a {
+    color: var(--ink-2); padding: 5px 10px; border-radius: 6px; border-left: 2px solid transparent;
+  }
+  aside nav a:hover { background: #eceff4; text-decoration: none; }
+  aside nav a.h2 { padding-left: 22px; font-size: 12.5px; color: var(--ink-3); }
+  aside nav .group { margin-top: 14px; font-size: 11px; letter-spacing: .1em; color: var(--ink-3); text-transform: uppercase; padding: 0 10px; }
+
+  /* -------------------------------- main --------------------------------- */
+  main { flex: 1 1 auto; min-width: 0; padding-top: 32px; }
+
+  header.hero {
+    background: linear-gradient(135deg, #0f172a 0%, #14324a 55%, #0e5f4a 100%);
+    color: #fff; border-radius: 14px; padding: 30px 32px; margin-bottom: 28px;
+  }
+  header.hero .eyebrow { font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; opacity: .7; }
+  header.hero h1 { margin: 8px 0 6px; font-size: 30px; letter-spacing: .01em; }
+  header.hero p { margin: 0; opacity: .86; max-width: 640px; }
+  header.hero .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  header.hero .chip {
+    background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.2);
+    padding: 3px 10px; border-radius: 999px; font-size: 12px;
+  }
+
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px 28px; margin-bottom: 20px; }
+  section > h2 {
+    margin: 0 0 4px; font-size: 21px; scroll-margin-top: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  section > h2 .tag {
+    font-size: 11px; font-weight: 600; letter-spacing: .06em; color: var(--brand);
+    background: var(--brand-soft); padding: 2px 8px; border-radius: 5px;
+  }
+  section > h2 .tag.pm { color: #7c3aed; background: #f3ebff; }
+  section > h2 .tag.dev { color: #0369a1; background: #e6f2fb; }
+  section > h2 .tag.user { color: #b45309; background: var(--warn-soft); }
+  section > .lede { color: var(--ink-2); margin: 0 0 18px; }
+  h3 { font-size: 16px; margin: 26px 0 8px; scroll-margin-top: 20px; }
+  h4 { font-size: 14px; margin: 18px 0 6px; }
+  p { margin: 10px 0; }
+  ul, ol { margin: 10px 0; padding-left: 22px; }
+  li { margin: 5px 0; }
+  li::marker { color: var(--ink-3); }
+  strong { font-weight: 650; }
+  code {
+    background: #eef1f6; padding: 1px 5px; border-radius: 4px;
+    font: 12.5px/1.5 "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+    color: #24324a;
+  }
+  pre {
+    background: var(--code-bg); color: var(--code-ink); border-radius: 8px;
+    padding: 14px 16px; overflow-x: auto; margin: 12px 0;
+    font: 12.5px/1.65 "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  }
+  pre code { background: none; color: inherit; padding: 0; }
+  pre .c { color: #94a3b8; }
+  pre .k { color: #7dd3fc; }
+  pre .s { color: #86efac; }
+
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13.5px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+  tbody tr:hover { background: #fafbfc; }
+  td .ok { color: var(--brand); font-weight: 600; }
+  td .no { color: var(--danger); font-weight: 600; }
+  td .mid { color: var(--warn); font-weight: 600; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 16px 0; }
+  .card { border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; background: #fcfdfe; }
+  .card .n { font-size: 24px; font-weight: 700; letter-spacing: -.01em; }
+  .card .l { font-size: 12.5px; color: var(--ink-3); margin-top: 2px; }
+
+  .callout { border-left: 3px solid var(--brand); background: var(--brand-soft); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .callout p { margin: 4px 0; }
+  .callout .h { font-weight: 650; font-size: 13.5px; }
+
+  .kbd {
+    display: inline-block; min-width: 20px; text-align: center;
+    border: 1px solid #ccd3de; border-bottom-width: 2px; border-radius: 5px;
+    padding: 1px 6px; font: 12px/1.5 "SF Mono", ui-monospace, Menlo, monospace;
+    background: #fff; color: #24324a;
+  }
+  .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 14px 0; font-size: 12.5px; }
+  .flow .box { border: 1px solid var(--line); background: #fcfdfe; border-radius: 7px; padding: 8px 12px; }
+  .flow .box.dark { background: #0f172a; color: #fff; border-color: #0f172a; }
+  .flow .arrow { color: var(--ink-3); }
+  footer { color: var(--ink-3); font-size: 12.5px; text-align: center; padding: 8px 0 0; }
+  @media (max-width: 900px) { aside { display: none; } }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <aside>
+    <div class="brand"><b>ELVA</b></div>
+    <div class="ver" id="ver-line">桌面应用开发工具</div>
+    <nav>
+      <a href="#what">这是什么</a>
+
+      <div class="group">产品经理视角</div>
+      <a href="#pm-position" class="h2">定位与目标用户</a>
+      <a href="#pm-value" class="h2">核心价值</a>
+      <a href="#pm-vs" class="h2">与 niva 的关系与超越</a>
+      <a href="#pm-road" class="h2">路线图</a>
+
+      <div class="group">程序员视角</div>
+      <a href="#dev-arch" class="h2">架构分层</a>
+      <a href="#dev-dir" class="h2">目录结构</a>
+      <a href="#dev-contract" class="h2">兼容层契约</a>
+      <a href="#dev-api" class="h2">API 与事件面</a>
+      <a href="#dev-build" class="h2">构建打包链路</a>
+      <a href="#dev-perf" class="h2">启动性能</a>
+      <a href="#dev-ext" class="h2">扩展点</a>
+      <a href="#dev-limits" class="h2">能力边界</a>
+
+      <div class="group">用户视角</div>
+      <a href="#user-start" class="h2">快速上手</a>
+      <a href="#user-keys" class="h2">快捷键</a>
+      <a href="#user-faq" class="h2">常见问题</a>
+
+      <div class="group">附录</div>
+      <a href="#changelog">变更记录</a>
+    </nav>
+  </aside>
+
+  <main>
+    <header class="hero">
+      <div class="eyebrow">Elva Devtools</div>
+      <h1>把 Web 项目变成桌面应用，不用写一行构建配置</h1>
+      <p>拖进一个项目文件夹 → 点「调试」本地跑起来 → 点「构建」拿到可分发产物。
+         Elva 是一个图形化的桌面应用开发工具，运行时契约沿用 Niva 生态，因此已有项目零改动可用。</p>
+      <div class="chips">
+        <span class="chip">Electron 44</span>
+        <span class="chip">Vue 3</span>
+        <span class="chip">129 个兼容 API</span>
+        <span class="chip">14 个运行时事件</span>
+        <span class="chip">macOS / Windows</span>
+      </div>
+    </header>
+
+    <!-- ============================== 概览 ============================== -->
+    <section id="what">
+      <h2>这是什么</h2>
+      <p class="lede">Elva 是「桌面应用运行时 + 图形化开发工作台」的组合。</p>
+      <div class="cards">
+        <div class="card"><div class="n">129</div><div class="l">兼容 API（14 个命名空间，逐名对齐）</div></div>
+        <div class="card"><div class="n">14</div><div class="l">运行时事件（窗口 / 菜单 / 托盘 / 快捷键 / 拖放 / 主题）</div></div>
+        <div class="card"><div class="n">3</div><div class="l">执行模型：同步 / 线程池限流 / 事件循环</div></div>
+        <div class="card"><div class="n">0</div><div class="l">老项目需要改动的代码行数</div></div>
+      </div>
+      <p>两个部件：</p>
+      <ul>
+        <li><strong>兼容运行时</strong>（Electron 主进程）：实现一整套与 Niva 同形的 API、事件与 <code>elva://</code> 自定义协议，
+            让按 Niva 契约写的网页能被当作桌面应用跑起来。</li>
+        <li><strong>工作台</strong>（Vue 3 渲染层）：项目列表、项目信息、配置编辑器，加上「调试 / 构建」两个动作。</li>
+      </ul>
+      <div class="callout">
+        <p class="h">Elva 不是 Niva</p>
+        <p>Elva 沿用 Niva 的<strong>接口契约</strong>（为了让老项目直接跑），但不是 Niva 的新版本、不做 Niva 的版本检测、
+           也不引导用户去下载 Niva。应用自身的版本、文档与品牌都是 Elva 自己的。</p>
+      </div>
+    </section>
+
+    <!-- ============================ 产品经理 ============================ -->
+    <section id="pm-position">
+      <h2><span class="tag pm">产品经理视角</span>定位与目标用户</h2>
+      <p class="lede">一句话：<strong>面向「已经有 Web 项目、想最快拿到桌面版」的开发者，把 Electron 的配置成本降到零。</strong></p>
+
+      <h3>要解决的问题</h3>
+      <table>
+        <thead><tr><th style="width:34%">现状</th><th>成本</th></tr></thead>
+        <tbody>
+          <tr><td>手动配 Electron</td><td>主进程 / preload / 打包配置 / 图标 / 签名，一套下来半天起步，且每个平台各一套</td></tr>
+          <tr><td>用 Tauri / Wails 等</td><td>体积小但要学 Rust/Go，前端开发者上手门槛高</td></tr>
+          <tr><td>用现成壳工具</td><td>多数只做「打包」，不做「本地调试闭环」——改一行代码要重新打包才能看到效果</td></tr>
+        </tbody>
+      </table>
+
+      <h3>目标用户</h3>
+      <ul>
+        <li><strong>主力用户</strong>：有 Vue / React / 原生 Web 项目的个人开发者，想把项目发成桌面版。</li>
+        <li><strong>次级用户</strong>：需要给内部工具做桌面客户端的小团队（不想为「一个壳」引入专门的客户端工程师）。</li>
+        <li><strong>非目标</strong>：需要精细控制主进程行为、需要原生模块深度集成的重型项目。</li>
+      </ul>
+
+      <h3>为什么是「调试 + 构建」两个动作</h3>
+      <p>开发者的真实循环是「改代码 → 看效果 → 重复」，最后才是「出包」。所以产品只暴露两个按钮，
+        但把「调试」做成<strong>带热更新的本地窗口</strong>（指向 dev server），而不是一次性的打包预览。
+        构建则是把同一份配置固化成可分发产物。</p>
+    </section>
+
+    <section id="pm-value">
+      <h2><span class="tag pm">产品经理视角</span>核心价值</h2>
+      <table>
+        <thead><tr><th style="width:22%">价值点</th><th style="width:39%">具体体现</th><th>为什么用户在意</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>零配置起步</strong></td>
+            <td>拖入文件夹即识别；没有配置文件会问你「要不要创建」，而不是报错退出</td>
+            <td>第一次使用的 5 分钟内就能看到窗口，而不是先读文档</td>
+          </tr>
+          <tr>
+            <td><strong>调试即预览</strong></td>
+            <td>「调试」用 <code>--debug-config / --debug-resource</code> 起一个独立进程指向 dev server</td>
+            <td>保留前端的热更新习惯，不用为每次改动付一次打包代价</td>
+          </tr>
+          <tr>
+            <td><strong>看得懂的构建</strong></td>
+            <td>构建过程用进度模态逐步汇报：准备环境 → 复制可执行文件 → 打包资源 → 压缩 → 生成图标 → 写 Info.plist</td>
+            <td>失败时能定位到具体阶段，而不是只给一个退出码</td>
+          </tr>
+          <tr>
+            <td><strong>键盘可用</strong></td>
+            <td>搜索、打开、新建、调试、构建、切 tab 都有快捷键（见 <a href="#user-keys">快捷键</a>）</td>
+            <td>重复性操作不打断心流；重度用户不用在鼠标与键盘间来回切</td>
+          </tr>
+          <tr>
+            <td><strong>状态可信</strong></td>
+            <td>空列表给出「还没有项目 / 拖进来或新建」的引导；搜不到时明确说「没有匹配项，按 Esc 清空」</td>
+            <td>不会对着空白区域猜「是我搜错了还是真没有」</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="pm-vs">
+      <h2><span class="tag pm">产品经理视角</span>与 niva 的关系与超越</h2>
+      <p class="lede">策略：<strong>吸收契约，重做体验。</strong>接口层面兼容换来存量项目，体验层面重新做换增量用户。</p>
+
+      <h3>继承的部分（有意保留，为了兼容）</h3>
+      <ul>
+        <li>129 个 API 的方法名、参数顺序、返回结构、执行模型（同步 / 线程池 / 事件循环）逐名一致。</li>
+        <li>14 个运行时事件的名称、载荷形态、派发时序一致，监听器签名仍是 <code>(event, data)</code>。</li>
+        <li>配置文件格式（<code>name</code> / <code>uuid</code> / <code>window</code> / <code>macos</code> / <code>windows</code> …）与平台覆盖合并规则一致。</li>
+        <li>注入 <code>window.Niva</code>，因此按原契约写的页面零改动可跑。</li>
+      </ul>
+
+      <h3>超越的部分（有意偏离）</h3>
+      <table>
+        <thead><tr><th style="width:26%">维度</th><th style="width:33%">niva</th><th>elva</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>窗口按钮</td>
+            <td>macOS 上隐藏系统红绿灯、用 HTML 自绘三个圆点</td>
+            <td><span class="ok">交给系统</span> —— macOS 红绿灯固定左上角，位置/间距/hover 全由系统负责；只有 Windows 无边框窗口才自绘</td>
+          </tr>
+          <tr>
+            <td>配置文件</td>
+            <td>只认 <code>niva.json</code></td>
+            <td><span class="ok">优先 <code>elva.json</code></span>，同时兼容旧的 <code>niva.json</code></td>
+          </tr>
+          <tr>
+            <td>键盘操作</td>
+            <td>无</td>
+            <td><span class="ok">完整键盘流</span>：搜索 → ↓ 选 → Enter 打开，另有新建/打开/调试/构建/切 tab</td>
+          </tr>
+          <tr>
+            <td>空状态</td>
+            <td>空白区域</td>
+            <td><span class="ok">区分</span>「没有项目」与「搜索无结果」，各给引导</td>
+          </tr>
+          <tr>
+            <td>启动路径</td>
+            <td>3 次串行 IPC 往返 + 静态加载构建层</td>
+            <td><span class="ok">并发 IPC</span> + 构建层按需加载（见 <a href="#dev-perf">启动性能</a>）</td>
+          </tr>
+          <tr>
+            <td>版本与品牌</td>
+            <td>联网查 niva 的 GitHub release，弹窗引导去下 niva</td>
+            <td><span class="ok">移除</span>。状态栏显示 elva 自身版本 + Electron 版本，文档打开应用自带文档</td>
+          </tr>
+          <tr>
+            <td>窗口缩放</td>
+            <td>固定 900×600，不可缩放</td>
+            <td><span class="ok">可缩放</span>，带最小尺寸 720×480</td>
+          </tr>
+          <tr>
+            <td>进度文案</td>
+            <td>硬编码中文「已完成 N%」</td>
+            <td><span class="ok">走 i18n</span>，中英双语一致</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout warn">
+        <p class="h">诚实说明：不照抄缺陷，但也不假装没有缺口</p>
+        <p>原版若干处实现与它自己的类型声明自相矛盾（例如 <code>showMenu</code> 实际调用了隐藏菜单的逻辑、
+           <code>isDecorated</code> 声明了但注册的是 <code>Decorated</code>）。Elva 保留了两套名字并修正了语义 ——
+           即「兼容调用方，但不复制 bug」。能力边界（Electron 做不到的原生行为）单列在
+           <a href="#dev-limits">能力边界</a>，不混进「已对齐」里。</p>
+      </div>
+    </section>
+
+    <section id="pm-road">
+      <h2><span class="tag pm">产品经理视角</span>路线图</h2>
+      <table>
+        <thead><tr><th style="width:14%">优先级</th><th style="width:30%">方向</th><th>要解决的问题</th></tr></thead>
+        <tbody>
+          <tr><td><span class="ok">P0</span></td><td>运行时契约对齐</td><td>让存量项目能跑起来 —— 已完成（129 API / 14 事件）</td></tr>
+          <tr><td><span class="ok">P0</span></td><td>工作台可用性</td><td>调试 / 构建闭环 + 键盘操作 —— 已完成</td></tr>
+          <tr><td><span class="mid">P1</span></td><td>项目模板与初始化</td><td>从零开始的项目不该先手写一个 HTML 才能被导入</td></tr>
+          <tr><td><span class="mid">P1</span></td><td>构建产物校验</td><td>构建「成功」但产物跑不起来是最贵的失败，需要启动自检</td></tr>
+          <tr><td><span class="mid">P1</span></td><td>错误可诊断化</td><td>把主进程/渲染进程的错误汇总到一个可复制面板，替代零散弹窗</td></tr>
+          <tr><td><span class="no">P2</span></td><td>多项目并行窗口</td><td>同时调两个项目时不必来回切换</td></tr>
+          <tr><td><span class="no">P2</span></td><td>Windows 代码签名</td><td>未签名产物会触发 SmartScreen 警告</td></tr>
+          <tr><td><span class="no">P2</span></td><td>增量构建</td><td>只改前端资源时跳过复制运行时，缩短构建耗时</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ============================= 程序员 ============================= -->
+    <section id="dev-arch">
+      <h2><span class="tag dev">程序员视角</span>架构分层</h2>
+      <p class="lede">三层：Electron 主进程运行时（兼容层）→ preload 桥 → 渲染层（工作台 UI / 被加载的项目页面）。</p>
+
+      <div class="flow">
+        <div class="box dark">Electron 主进程<br /><small>兼容运行时 + 工作台 IPC</small></div>
+        <span class="arrow">→</span>
+        <div class="box">preload<br /><small>contextBridge 注入主世界</small></div>
+        <span class="arrow">→</span>
+        <div class="box">渲染层<br /><small>window.Niva / window.Elva</small></div>
+      </div>
+
+      <h3>主进程运行时</h3>
+      <ul>
+        <li><code>runtime/context.js</code> 读配置 → 生成 <code>id_name</code>（<code>{name}_{uuid前8位}</code>）→ 准备 data/cache/temp 目录。</li>
+        <li><code>runtime/api-manager.js</code> 维护注册表，并按 <strong>三类执行模型</strong> 分派调用。</li>
+        <li>各类 manager：窗口（<code>windows.js</code>）、菜单（<code>menu.js</code>）、托盘（<code>tray.js</code>）、快捷键（<code>shortcut.js</code>）。</li>
+        <li><code>runtime/api/*.js</code> 按命名空间拆 14 个文件，<code>api/index.js</code> 是总注册表。</li>
+        <li>自定义协议 <code>elva://</code> 在 <code>app.ready</code> 之前声明为 privileged，再由 <code>protocol.handle</code> 提供资源。</li>
+      </ul>
+
+      <h3>preload 桥</h3>
+      <ul>
+        <li>用 <code>contextBridge</code> 把兼容运行时注入<strong>主世界</strong>，因此页面里能直接写 <code>Niva.api.xxx()</code>，同时保留 <code>contextIsolation</code>。</li>
+        <li>额外暴露自己的具名白名单 <code>electronAPI</code>（工作台专用：读应用信息、开外部链接、选文件），不做通用透传。</li>
+        <li>拖放事件的绝对路径只能在渲染侧取到，这里用 <code>webUtils.getPathForFile</code> 解析后回传主进程。</li>
+      </ul>
+
+      <h3>渲染层</h3>
+      <ul>
+        <li>工作台 UI（Vue 3 单文件组件，无 UI 框架依赖）：标题栏 / 状态栏 / 模态宿主 / 页面。</li>
+        <li>状态层用 <code>reactive</code> + class 模型（<code>models/*.js</code>），与 React 版的 state-model 语义一一对应。</li>
+      </ul>
+    </section>
+
+    <section id="dev-dir">
+      <h2><span class="tag dev">程序员视角</span>目录结构</h2>
+<pre><code>elva/
+├── app/
+│   ├── electron/
+│   │   ├── main.js                 <span class="c">// 入口：项目模式 / 工作台模式分流</span>
+│   │   ├── preload.js              <span class="c">// 主世界注入 + electronAPI 白名单</span>
+│   │   └── runtime/
+│   │       ├── index.js            <span class="c">// bootstrap：组装 manager、协议、IPC</span>
+│   │       ├── api-manager.js      <span class="c">// 注册表 + 三类执行模型</span>
+│   │       ├── context.js          <span class="c">// id_name / 目录 / 配置加载</span>
+│   │       ├── options.js          <span class="c">// 平台覆盖合并、参数解析</span>
+│   │       ├── windows.js menu.js tray.js shortcut.js
+│   │       ├── events.js           <span class="c">// 事件派发（三 key + 异步）</span>
+│   │       ├── resource.js mime.js glob.js ids.js accelerator.js
+│   │       └── api/                <span class="c">// 14 个命名空间，129 个方法</span>
+│   ├── public/
+│   │   └── elva-docs.html          <span class="c">// 本文档（随应用分发）</span>
+│   └── src/
+│       ├── App.vue main.js
+│       ├── components/devtools/    <span class="c">// 标题栏/状态栏/模态/页面组件</span>
+│       ├── devtools/
+│       │   ├── models/             <span class="c">// app / project / history / modal / locale</span>
+│       │   ├── build/              <span class="c">// 构建层（按需动态加载）</span>
+│       │   ├── composables/        <span class="c">// useFileDrop / useShortcuts</span>
+│       │   ├── i18n.js result.js error.js utils.js templates.js
+│       └── assets/devtools/        <span class="c">// 扁平 CSS（无 sass）+ 图标字体</span>
+├── docs/
+│   ├── elva-架构与实现.md
+│   └── niva-parity.md              <span class="c">// 与原版的行为差异登记表</span>
+└── tools/
+    ├── audit/collect-niva-apis.py  <span class="c">// 从原版源码抽取 API 名单</span>
+    └── verify/*.js                 <span class="c">// 端到端验收与回归脚本</span></code></pre>
+    </section>
+
+    <section id="dev-contract">
+      <h2><span class="tag dev">程序员视角</span>兼容层契约</h2>
+
+      <h3>IPC 协议</h3>
+      <p>渲染 → 主：<code>[callbackId, "ns.method", args]</code>；主 → 渲染：<code>[callbackId, code, message, data]</code>。</p>
+<pre><code><span class="c">// 调用</span>
+Niva.call(<span class="s">'window.setTitle'</span>, [<span class="s">'Hello'</span>])
+  → postMessage([12, <span class="s">"window.setTitle"</span>, [<span class="s">"Hello"</span>]])
+
+<span class="c">// 成功</span>
+[12, 0, <span class="s">""</span>, null]
+
+<span class="c">// 失败：code !== 0 时 reject 的是**整个数组**，不是 Error 对象</span>
+[12, 404, <span class="s">"window not found"</span>, null]</code></pre>
+      <div class="callout warn">
+        <p class="h">两个必须知道的细节</p>
+        <ul>
+          <li><code>code !== 0</code> 时 <code>reject</code> 的值是数组本身（<code>[id, code, message, data]</code>），
+              所以调用方要判 <code>Array.isArray(err)</code> 才能取到 <code>err[2]</code> 里的消息。</li>
+          <li>返回的 Promise 上额外挂了 <code>.resolve</code> / <code>.reject</code>，是原版的历史设计，保留以兼容。</li>
+        </ul>
+      </div>
+
+      <h3>三类执行模型</h3>
+      <table>
+        <thead><tr><th style="width:20%">模型</th><th style="width:26%">注册方式</th><th>语义与适用</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>同步</td><td><code>register_api</code></td>
+            <td>在事件循环里直接执行，立即返回。用于取值类轻操作（拿窗口尺寸、读配置）。</td>
+          </tr>
+          <tr>
+            <td>线程池</td><td><code>register_async_api</code></td>
+            <td>投到固定大小（4）的并发池，超出的排队。用于文件 IO、网络、起子进程等会阻塞的操作。</td>
+          </tr>
+          <tr>
+            <td>事件循环</td><td><code>register_event_api</code></td>
+            <td>抛回主循环执行，保证在主线程上与 UI 操作串行。用于关窗、开新窗口、退出等必须有序的动作。</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>执行模型是契约的一部分：同一个方法用错模型会导致时序问题（例如关窗抢在保存前执行）。
+         Elva 对 129 个方法逐一比对了模型归属，不只是名字对齐。</p>
+
+      <h3>事件派发</h3>
+      <p>一次 <code>emit('window.focused', data)</code> 会按三个 key 依次通知：</p>
+      <ol>
+        <li><code>window.focused</code>（精确匹配）</li>
+        <li><code>window.*</code>（命名空间通配）</li>
+        <li><code>*</code>（全通配）</li>
+      </ol>
+      <p>三条通知都是<strong>异步</strong>的（<code>setTimeout(..., 0)</code>），监听器签名统一 <code>(event, data)</code>。
+         因此「注册后同步检查命中数」必须为 0 —— 这本身就是一条可断言的契约。</p>
+    </section>
+
+    <section id="dev-api">
+      <h2><span class="tag dev">程序员视角</span>API 与事件面</h2>
+
+      <h3>14 个命名空间</h3>
+      <table>
+        <thead><tr><th style="width:16%">命名空间</th><th style="width:12%">方法数</th><th>内容</th></tr></thead>
+        <tbody>
+          <tr><td><code>window</code></td><td>54</td><td>窗口尺寸/位置/状态/装饰/全屏/图标/标题、窗口间消息、菜单显隐</td></tr>
+          <tr><td><code>fs</code></td><td>12</td><td>读/写/追加/删除/复制/重命名/列目录/递归列目录/stat/exists，支持 glob 与 excludes</td></tr>
+          <tr><td><code>process</code></td><td>10</td><td>pid、args、env、cwd、currentExe、exec（含 detached）、open、exit、version</td></tr>
+          <tr><td><code>webview</code></td><td>5</td><td>baseUrl、baseFileSystemUrl、openDevtools、重载等</td></tr>
+          <tr><td><code>os</code></td><td>5</td><td>info、arch、sep、locale、dirs（12 个标准目录）</td></tr>
+          <tr><td><code>monitor</code></td><td>4</td><td>枚举显示器、从坐标取显示器、尺寸/位置（逻辑像素 + 物理像素）</td></tr>
+          <tr><td><code>dialog</code></td><td>6</td><td>消息框、选目录、选文件、保存文件</td></tr>
+          <tr><td><code>clipboard</code></td><td>2</td><td>read / write</td></tr>
+          <tr><td><code>http</code></td><td>3</td><td>get / post / request，支持单请求代理</td></tr>
+          <tr><td><code>resource</code></td><td>3</td><td>读资源、列资源、解压内嵌资源</td></tr>
+          <tr><td><code>shortcut</code></td><td>4</td><td>注册/注销/列出全局快捷键、触发</td></tr>
+          <tr><td><code>tray</code></td><td>5</td><td>创建/销毁/更新托盘、列出、按窗口校验归属</td></tr>
+          <tr><td><code>extra</code></td><td>macOS 专属</td><td>取当前活跃窗口、按 id 聚焦窗口、隐藏其他应用</td></tr>
+          <tr><td><code>windowExtra</code></td><td>按平台</td><td>macOS 10 个 / Windows 7 个，平台互斥注册</td></tr>
+        </tbody>
+      </table>
+
+      <h3>14 个运行时事件</h3>
+      <table>
+        <thead><tr><th style="width:26%">事件</th><th>载荷 / 触发</th></tr></thead>
+        <tbody>
+          <tr><td><code>window.focused</code> / <code>window.blurred</code></td><td><code>boolean</code>；窗口获得/失去焦点</td></tr>
+          <tr><td><code>window.resized</code> / <code>moved</code></td><td><code>{width,height}</code> / <code>{x,y}</code>；逻辑像素</td></tr>
+          <tr><td><code>window.scaleFactorChanged</code></td><td><code>number</code>；跨显示器导致的缩放变化</td></tr>
+          <tr><td><code>window.themeChanged</code></td><td><code>"dark" | "light"</code>；系统主题变化</td></tr>
+          <tr><td><code>window.closeRequested</code></td><td>用户点关闭；可拦截做「未保存确认」</td></tr>
+          <tr><td><code>menu.clicked</code></td><td>菜单项 id（纯数字，不是对象）</td></tr>
+          <tr><td><code>tray.leftClicked</code> / <code>rightClicked</code> / <code>doubleClicked</code></td><td>托盘鼠标事件</td></tr>
+          <tr><td><code>shortcut.triggered</code></td><td>全局快捷键被按下</td></tr>
+          <tr><td><code>fileDrop.hovered</code> / <code>dropped</code> / <code>cancelled</code></td><td>文件拖放；载荷含绝对路径与坐标</td></tr>
+          <tr><td><code>ipc.callback</code> / <code>ipc.error</code></td><td>API 调用回包与主进程侧异常</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="dev-build">
+      <h2><span class="tag dev">程序员视角</span>构建打包链路</h2>
+
+      <h3>macOS</h3>
+      <ol>
+        <li>准备目录结构（<code>Contents/MacOS</code>、<code>Contents/Resources</code>）。</li>
+        <li>复制可执行文件 —— elva 下复制的是 Electron 主可执行文件（Niva 下是它自己的原生运行时）。</li>
+        <li>打包资源：把项目目录按索引 + 数据块写进 <code>RESOURCE_INDEXES</code> / <code>RESOURCE_DATA</code> 两个具名资源段。</li>
+        <li>压缩：用浏览器原生 <code>CompressionStream('deflate-raw')</code>（不引 pako）。</li>
+        <li>生成 <code>.icns</code> 图标与 <code>Info.plist</code>。</li>
+      </ol>
+
+      <h3>Windows</h3>
+      <ol>
+        <li>准备构建目录，写入 <code>VERSION_INFO</code>（版本号会被拆成 4 段数字）。</li>
+        <li>用随包分发的辅助程序替换可执行文件的图标与版本信息段。</li>
+        <li>追加资源段，产出单个 <code>.exe</code>。</li>
+      </ol>
+
+      <div class="callout">
+        <p class="h">资源内嵌的形态</p>
+        <p>产物不是「exe + 一堆散落文件」，而是把前端资源压缩后塞进可执行文件的两个资源段。
+           运行时按索引随机读取，不必先解压到磁盘 —— 这是它能做到单文件分发的原因。</p>
+      </div>
+    </section>
+
+    <section id="dev-perf">
+      <h2><span class="tag dev">程序员视角</span>启动性能</h2>
+      <p class="lede">冷启动路径上做了三件事，都是可测量的。</p>
+
+      <h3>1. 启动 IPC 并发化</h3>
+      <p>原路径是三条串行 await，每条都要一次渲染进程 ↔ 主进程往返：</p>
+<pre><code><span class="c">// 之前：三次往返串起来等</span>
+systemInfo = <span class="k">await</span> Niva.api.os.info()
+rawArgs    = <span class="k">await</span> Niva.api.process.args()
+<span class="k">await</span> app.init()                     <span class="c">// 内部还有 history + locale 两次 IO</span>
+
+<span class="c">// 现在：一个往返的等待时间</span>
+<span class="k">const</span> [info, rawArgs] = <span class="k">await</span> Promise.all([
+  Niva.api.os.info(),
+  Niva.api.process.args(),
+  app.init(),
+])</code></pre>
+      <p>用验收脚本实测「3 次串行」与「3 次并发」的往返耗时差，结果见 <a href="#changelog">变更记录</a>。</p>
+
+      <h3>2. 构建层按需加载</h3>
+      <p><code>build-macos</code> / <code>build-windows</code> / <code>templates</code> 属于「点了构建才用」的代码，
+         改成动态 <code>import()</code> 后从首屏 bundle 里拆了出去：</p>
+<pre><code><span class="c">// 构建产物里能看到它们成了独立 chunk</span>
+dist/assets/build-macos-*.js      1.47 kB
+dist/assets/build-windows-*.js    1.89 kB
+dist/assets/base-*.js             1.02 kB
+dist/assets/index-*.js          109.18 kB   <span class="c">← 首屏</span></code></pre>
+
+      <h3>3. 消除白闪</h3>
+      <p>窗口创建时指定 <code>backgroundColor</code> 与页面背景一致，避免「先白屏再渲染」的闪一下。
+         窗口尺寸也改为可缩放（带最小尺寸），而不是原版的固定尺寸。</p>
+
+      <h3>4. 历史与语言并发初始化</h3>
+      <p><code>app.init()</code> 内部把「读历史文件」与「读系统语言」由串行改为 <code>Promise.all</code>。</p>
+    </section>
+
+    <section id="dev-ext">
+      <h2><span class="tag dev">程序员视角</span>扩展点</h2>
+
+      <h3>加一个兼容 API</h3>
+      <ol>
+        <li>在 <code>electron/runtime/api/&lt;命名空间&gt;.js</code> 里按模型选 <code>register</code> / <code>registerAsync</code> / <code>registerEvent</code>。</li>
+        <li>用 <code>arg(args, i)</code> / <code>optional(args, i)</code> 取值，保持参数校验风格一致。</li>
+        <li>在 <code>api/index.js</code> 的 <code>registerAll</code> 里挂上（注册顺序会影响 <code>window.list()</code> 的输出次序）。</li>
+        <li>跑 <code>tools/verify/elva-dump-apis.js</code> 导出运行时注册表，与 <code>tools/audit/collect-niva-apis.py</code> 抽出的原版名单做逐名 diff。</li>
+      </ol>
+
+      <h3>加一个新页面</h3>
+      <ol>
+        <li>组件放 <code>src/components/devtools/</code>，样式写进 <code>src/assets/devtools/pages.css</code>（无 sass，扁平选择器）。</li>
+        <li>文案先加进 <code>src/devtools/i18n.js</code> 的 <code>en_US</code> 与 <code>zh_CN</code>，再通过 <code>locale.t('KEY')</code> 取。</li>
+        <li>挂快捷键：在 <code>composables/useShortcuts.js</code> 的 <code>SHORTCUT</code> 里加常量与键位，组件内用 <code>onShortcut({...})</code> 订阅。</li>
+      </ol>
+
+      <h3>加一个事件</h3>
+      <p>主进程侧用 <code>emitToWindow(nivaWindow, 'ns.name', payload)</code>，渲染侧用
+         <code>Niva.addEventListener('ns.name', (event, data) =&gt; {})</code> 监听。三个 key 的派发规则由
+         <code>runtime/events.js</code> 统一处理，不需要各调用点重复。</p>
+    </section>
+
+    <section id="dev-limits">
+      <h2><span class="tag dev">程序员视角</span>能力边界</h2>
+      <p class="lede">这些是 Electron 本身做不到或做法不同的，不假装已对齐。</p>
+      <table>
+        <thead><tr><th style="width:30%">能力</th><th style="width:26%">原版行为</th><th>elva 现状</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>window.setDecorated</code></td>
+            <td>macOS 支持运行时开关窗口装饰</td>
+            <td><span class="no">无对应 API</span> —— 保留注册、不抛异常、返回类型合法；首次调用告警一次</td>
+          </tr>
+          <tr>
+            <td>编程式拖动窗口</td>
+            <td><code>dragWindow()</code> 走原生 <code>drag_window</code></td>
+            <td><span class="mid">改由 CSS</span> <code>-webkit-app-region: drag</code> 承担；API 仍保留可调用</td>
+          </tr>
+          <tr>
+            <td>系统光标控制</td>
+            <td>设置 / 抓取光标位置、抓取光标</td>
+            <td><span class="mid">降级</span>：不抛异常、返回合法占位值</td>
+          </tr>
+          <tr>
+            <td>窗口置底 / 置顶分层</td>
+            <td><code>setAlwaysOnBottom</code></td>
+            <td><span class="mid">降级</span>：同上</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>降级的统一原则：<strong>保留方法存在性 + 返回类型合法 + 不抛异常 + 首次调用告警</strong>。
+         因为调用方拿到「方法不存在」比「功能缺失」更偏离契约。</p>
+    </section>
+
+    <!-- ============================== 用户 ============================== -->
+    <section id="user-start">
+      <h2><span class="tag user">用户视角</span>快速上手</h2>
+      <ol>
+        <li><strong>导入项目</strong>：把项目文件夹拖进窗口，或点「选择项目」定位。
+            如果目录里没有配置文件，Elva 会问你要不要创建 —— 选「确认」即可，它会根据
+            <code>package.json</code> 猜出项目类型（React / Vue / Vite / 纯静态）并生成一份带合理默认值的配置。</li>
+        <li><strong>调试</strong>：切到「项目配置」核对 <code>debug.entry</code>（前端 dev server 地址）与
+            <code>debug.resource</code>，然后点「调试」。会另起一个窗口加载你的页面，改动照常热更新。</li>
+        <li><strong>构建</strong>：点「构建」，选择输出路径。进度条会逐阶段汇报，完成后自动打开产物所在目录。</li>
+      </ol>
+      <p>左侧列表就是你的项目历史，点一下即可切换；hover 出现删除图标，删除有二次确认。</p>
+    </section>
+
+    <section id="user-keys">
+      <h2><span class="tag user">用户视角</span>快捷键</h2>
+      <p class="lede">macOS 用 <span class="kbd">⌘</span>，Windows 用 <span class="kbd">Ctrl</span>。</p>
+      <table>
+        <thead><tr><th style="width:34%">按键</th><th>作用</th></tr></thead>
+        <tbody>
+          <tr><td><span class="kbd">⌘</span> <span class="kbd">F</span></td><td>聚焦搜索框（光标已在框里时会全选，方便直接覆盖输入）</td></tr>
+          <tr><td><span class="kbd">⌘</span> <span class="kbd">N</span></td><td>新建项目</td></tr>
+          <tr><td><span class="kbd">⌘</span> <span class="kbd">O</span></td><td>选择已有项目</td></tr>
+          <tr><td><span class="kbd">⌘</span> <span class="kbd">D</span></td><td>调试当前项目</td></tr>
+          <tr><td><span class="kbd">⌘</span> <span class="kbd">B</span></td><td>构建当前项目</td></tr>
+          <tr><td><span class="kbd">⌘</span> <span class="kbd">1</span> / <span class="kbd">2</span></td><td>切换「项目信息 / 项目配置」</td></tr>
+          <tr><td><span class="kbd">↑</span> <span class="kbd">↓</span></td><td>在项目列表里上下移动选中项（搜索框里同样可用）</td></tr>
+          <tr><td><span class="kbd">Enter</span></td><td>打开选中的项目</td></tr>
+          <tr><td><span class="kbd">Esc</span></td><td>清空搜索 / 关闭弹窗</td></tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        <p class="h">完整的键盘流</p>
+        <p><span class="kbd">⌘</span><span class="kbd">F</span> → 打字 → <span class="kbd">↓</span> → <span class="kbd">Enter</span> → &#8203;
+           <span class="kbd">⌘</span><span class="kbd">D</span>，全程不用碰鼠标。</p>
+      </div>
+      <p>菜单栏「快捷键」入口（状态栏第三个）会随时把这些键位摊出来，不用回来翻文档。</p>
+    </section>
+
+    <section id="user-faq">
+      <h2><span class="tag user">用户视角</span>常见问题</h2>
+
+      <h4>我的项目里是 <code>niva.json</code>，需要改名吗？</h4>
+      <p>不需要。Elva 优先读 <code>elva.json</code>，找不到就自动回退读 <code>niva.json</code>。
+         新建项目时会生成 <code>elva.json</code>；两者同时存在时以 <code>elva.json</code> 为准。</p>
+
+      <h4>点「调试」没反应 / 窗口一片白？</h4>
+      <p>多半是 <code>debug.entry</code> 指的前端服务没起来。先在项目目录里把 dev server 跑起来，
+         确认 <code>http://127.0.0.1:端口</code> 能打开，再回 Elva 点调试。</p>
+
+      <h4>构建失败怎么办？</h4>
+      <p>看进度条停在哪一步 —— 阶段名就是失败位置。常见三类：</p>
+      <ul>
+        <li><strong>准备构建环境</strong>失败：输出目录没有写权限，或路径里有特殊字符。</li>
+        <li><strong>打包 / 压缩资源</strong>失败：资源目录里有读不到的文件（权限或损坏的软链接）。</li>
+        <li><strong>生成图标</strong>失败：图标不是合法的 PNG，或尺寸不是正方形。</li>
+      </ul>
+
+      <h4>为什么 macOS 上的窗口按钮和别人的不一样？</h4>
+      <p>因为用的是系统原生那套 —— 左上角的红黄绿圆点就是 macOS 自己的按钮，位置和行为都由系统负责，
+         所以看起来跟所有正规 mac 应用一致。Windows 上因为窗口是无边框的，没有系统按钮，才由 Elva 自绘。</p>
+
+      <h4>状态栏右边那串是什么？</h4>
+      <p>系统信息 + 版本号：<code>Mac OS arm64 | Elva 0.1.0 | Electron 44.x</code>。
+         单击复制到剪贴板（反馈问题时报这个最有用），双击打开开发者工具。</p>
+
+      <h4>怎么确认它在用我的配置文件？</h4>
+      <p>切到「项目配置」tab，标题栏带红星号说明有未保存修改；「项目信息」里的「配置文件」一行显示的就是实际读取的文件路径。</p>
+    </section>
+
+    <!-- ============================== 附录 ============================== -->
+    <section id="changelog">
+      <h2>变更记录</h2>
+      <table>
+        <thead><tr><th style="width:18%">日期</th><th>内容</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>2026-09-22</td>
+            <td>
+              <strong>运行时契约对齐完成</strong>：129 个 API 逐名核对（0 缺失）、执行模型逐名比对、14 个事件全链路验证。<br />
+              <strong>工作台重建</strong>：按官方 Devtools 的结构重做界面（项目列表 + 项目信息 / 项目配置双 tab + 调试/构建 + 状态栏）。<br />
+              <strong>macOS 窗口按钮交还系统</strong>：不再自绘红绿灯，只有 Windows 自绘。<br />
+              <strong>身份独立</strong>：移除联网版本检测与全部 niva 品牌链接；新增 <code>elva.json</code>（兼容旧 <code>niva.json</code>）。<br />
+              <strong>交互增强</strong>：全局快捷键、列表键盘导航、两类空态引导、进度文案 i18n。<br />
+              <strong>启动优化</strong>：启动路径 IPC 并发化、构建层动态加载、消除白闪、窗口可缩放。
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <footer>Elva Devtools · 本页随应用分发，可离线查阅</footer>
+  </main>
+</div>
+
+<script>
+  // 侧栏高亮当前章节
+  const links = [...document.querySelectorAll('aside nav a')]
+  const targets = links
+    .map((a) => ({ a, el: document.querySelector(a.getAttribute('href')) }))
+    .filter((t) => t.el)
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue
+        links.forEach((a) => (a.style.background = ''))
+        const hit = targets.find((t) => t.el === e.target)
+        if (hit) hit.a.style.background = '#eceff4'
+      }
+    },
+    { rootMargin: '-10% 0px -80% 0px' },
+  )
+  targets.forEach((t) => io.observe(t.el))
+
+  // 版本行：能拿到应用信息就填真实版本
+  ;(async () => {
+    try {
+      const info = await window.electronAPI?.getAppInfo?.()
+      if (info) {
+        document.getElementById('ver-line').textContent =
+          `v${info.version} · Electron ${info.electron} · ${info.platform}/${info.arch}`
+      }
+    } catch {
+      /* 在浏览器里打开时就保持默认文案 */
+    }
+  })()
+</script>
+</body>
+</html>

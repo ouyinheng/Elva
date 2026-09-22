@@ -1,0 +1,152 @@
+/* ==========================================================================
+ * 窗口外壳样式
+ *
+ * 原版是 SCSS 嵌套写法，这里逐层展开为等价的后代选择器（elva 未引入 sass）。
+ * 关键点：
+ *   - 三种平台形态靠 .os-mac / .os-windows 切换（platform 取 os 名的首段小写）
+ *   - macOS：标题栏透明，**用系统原生红绿灯**（固定左上角），左侧留出空间，
+ *            品牌字靠右
+ *   - Windows：无边框窗口没有系统按钮，自绘右侧 46px 宽的三个方块按钮
+ * ========================================================================== */
+
+@font-face {
+  font-family: LogoFont;
+  src: url(./nasalization-rg-1.ttf);
+}
+
+/* --------------------------------- windows -------------------------------- */
+
+.window {
+  background: #eff1f2;
+}
+
+/* 窗口拖动：原版靠 Niva.api.window.dragWindow()（tao 的 drag_window）。
+   Electron 没有对应的编程式 API，实际拖动由这个 CSS 属性承担 ——
+   这是本机唯一可行的窗口拖动方式，运行时 API 调用仍保留在组件里。 */
+.window .title-bar {
+  flex: 0 0 auto;
+  height: 44px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  -webkit-app-region: drag;
+}
+
+.window .title-bar .title-bar-controls {
+  padding: 0 16px;
+  display: flex;
+  /* 拖动区域内的按钮必须显式退出拖动，否则点不动 */
+  -webkit-app-region: no-drag;
+}
+
+.window .title-bar .title-bar-text {
+  display: flex;
+  align-self: center;
+  padding-right: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  font-family: LogoFont;
+}
+
+.window .window-body {
+  flex: 1 1 auto;
+  display: flex;
+  overflow: hidden;
+}
+
+.window .status-bar {
+  flex: 0 0 auto;
+  height: 28px;
+  width: 100%;
+  background: #f5f6f7;
+  display: flex;
+  align-items: center;
+}
+
+.window .status-bar .status-bar-field {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.5);
+  position: relative;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.window .status-bar .status-bar-field:hover {
+  color: #35dd8e;
+}
+
+.window .status-bar .status-bar-field .icon-sm {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+}
+
+.window .status-bar .status-bar-field.flex-end {
+  margin-left: auto;
+  font-size: 10px;
+}
+
+.window .status-bar .status-bar-field.flex-end .icon-sm {
+  font-size: 12px;
+}
+
+.window .status-bar-dev {
+  background: #ff9999;
+}
+
+/* ----------------------------------- mac ---------------------------------- */
+
+/* macOS 用系统原生红绿灯（固定左上角）。
+   不渲染任何自绘按钮，只需把左侧约 80px 让给它们，品牌字靠右。 */
+.window.os-mac .title-bar {
+  padding-left: 80px;
+  justify-content: flex-end;
+}
+
+.window.os-mac .title-bar .title-bar-text {
+  padding-right: 24px;
+}
+
+/* --------------------------------- windows os ------------------------------ */
+
+.window.os-windows .title-bar {
+  flex-direction: row-reverse;
+}
+
+.window.os-windows .title-bar .title-bar-text {
+  padding-left: 24px;
+}
+
+.window.os-windows .title-bar .title-bar-controls {
+  padding-right: 0;
+}
+
+.window.os-windows .title-bar .title-bar-controls button {
+  border: none;
+  background: transparent;
+  width: 46px;
+  height: 44px;
+}
+
+.window.os-windows .title-bar .title-bar-controls button:hover {
+  transition: background-color 0.1s;
+  background-color: #e5e5e5;
+}
+
+.window.os-windows .title-bar .title-bar-controls button:active {
+  background-color: #cccccc;
+}
+
+.window.os-windows .title-bar .title-bar-controls button[aria-label="Close"]:hover {
+  background-color: #e81123;
+  color: #fff;
+}
+
+.window.os-windows .title-bar .title-bar-controls button[aria-label="Close"]:active {
+  background-color: #f1707a;
+}

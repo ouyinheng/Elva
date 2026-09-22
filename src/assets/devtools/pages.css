@@ -1,0 +1,965 @@
+/* ==========================================================================
+ * 页面样式 —— 对齐原版 devtools 的四个 scss：
+ *   pages/project/style.scss        → 项目页（左列表 / 右信息 + tabs）
+ *   pages/import/style.scss         → 导入页 + 项目列表
+ *   pages/project/config-editor/style.scss → 配置编辑器
+ *   modals/style.scss               → 模态框
+ *
+ * 同样是 SCSS 嵌套展开为扁平选择器，取值与层级一一对应。
+ * ========================================================================== */
+
+/* ============================== project page ============================== */
+
+.project-page {
+  display: flex;
+  flex: 1 1 auto;
+  background: white;
+}
+
+.project-page .directory {
+  /* 宽度由 ProjectPage.vue 按拖拽结果以内联 style 给出；
+     这里的 28% 只是脚本尚未挂载时的兜底值（与原版默认一致）。 */
+  width: 28%;
+  min-width: 240px;
+  flex: 0 0 auto;
+  height: 100%;
+  padding-top: 4px;
+
+  display: flex;
+  overflow: hidden;
+}
+
+/* 左右分栏的拖拽把手。宽度很窄但有 5px 命中区，比 0.5px 的视觉分隔线好抓。 */
+.project-page .sidebar-resizer {
+  flex: 0 0 auto;
+  width: 5px;
+  cursor: col-resize;
+  position: relative;
+  z-index: 11;
+  outline: none;
+}
+
+.project-page .sidebar-resizer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 1px;
+  background: transparent;
+  transition: background-color 0.12s;
+}
+
+/* hover / 拖拽中 / 键盘聚焦时给出可见反馈，平时完全隐形（视觉上仍是 0.5px 分隔线） */
+.project-page .sidebar-resizer:hover::after,
+.project-page .sidebar-resizer.is-active::after,
+.project-page .sidebar-resizer:focus-visible::after {
+  background: #35dd8e;
+}
+
+/* 拖拽期间全局换成 col-resize 并禁掉选中，否则光标会在项目名上闪 */
+body.is-resizing-sidebar {
+  cursor: col-resize;
+  user-select: none;
+}
+
+body.is-resizing-sidebar * {
+  cursor: col-resize !important;
+}
+
+.project-page .project-info {
+  position: relative;
+  flex: 1 1 auto;
+  border-top: solid 0.5px rgba(5, 15, 35, 0.12);
+  z-index: 9;
+  /* 原版是 550px。为了「左栏可拖拽」这里放宽到 400px：
+     窗口最小 720px 时，550px 的下限会让左栏几乎没有可拖拽的余量。 */
+  min-width: 400px;
+  /* 关键：让 .tabs 能拿到确定高度。缺了这行，下面的 article 高度塌成 auto，
+     配置编辑器（内部用 height:100%）会直接变 0 高度 → 看起来「项目配置没有内容」 */
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* 左右分栏之间的分隔线。
+   z-index 必须显式提高：它是 .project-info 的伪元素，默认 z-index:auto，
+   层叠上排在后面的 .tabs 之下。项目信息 tab 背景透明看不出问题，
+   但项目配置 tab（#config-tab）带不透明底色 #eff1f2，会把这条线整条盖掉 ——
+   表现就是「项目配置那一侧没有边框」。 */
+.project-page .project-info::before {
+  content: " ";
+  position: absolute;
+  width: 0.5px;
+  background-color: rgba(5, 15, 35, 0.12);
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 10;
+}
+
+.project-page .project-info .tabs {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* 原版把 tab 条用 fixed + 负 margin「提」到标题栏那一行，视觉上与标题齐平 */
+.project-page .project-info .tabs .tabs-menu {
+  position: fixed;
+  height: 44px;
+  margin-top: -44px;
+  width: 400px;
+
+  padding: 0 24px;
+}
+
+.project-page .project-info .tabs .tabs-menu::before {
+  content: " ";
+  position: absolute;
+  width: 0.5px;
+  background-color: rgba(5, 15, 35, 0.12);
+  top: 0;
+  left: 0;
+  bottom: 0;
+}
+
+.project-page .project-info .tabs .tabs-menu button {
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.5);
+  line-height: 44px;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+}
+
+.project-page .project-info .tabs .tabs-menu button + button {
+  margin-left: 36px;
+}
+
+.project-page .project-info .tabs .tabs-menu button[aria-selected="true"] {
+  color: #000;
+}
+
+.project-page .project-info .tabs .tabs-menu button[aria-selected="true"]::after {
+  content: "";
+  height: 2px;
+  background: #35dd8e;
+  display: block;
+  margin-top: -2px;
+}
+
+.project-page .project-info .tabs article.tabs-panel {
+  padding: 24px 24px 32px;
+  /* 占满剩余高度；内容超出时**可纵向滚动**（原版没有处理，长配置直接溢出被裁掉） */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* 滚动条做得细一点，跟整体风格一致 */
+.project-page .project-info .tabs article.tabs-panel::-webkit-scrollbar {
+  width: 10px;
+}
+
+.project-page .project-info .tabs article.tabs-panel::-webkit-scrollbar-thumb {
+  background: rgba(5, 15, 35, 0.18);
+  border-radius: 5px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+.project-page .project-info .tabs article.tabs-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(5, 15, 35, 0.3);
+  background-clip: content-box;
+}
+
+.project-page .project-info .tabs article.tabs-panel .project-detail section:not(:last-child) {
+  border-bottom: solid 0.5px rgba(5, 15, 35, 0.12);
+}
+
+.project-page .project-info .tabs article.tabs-panel .project-detail section.pd-base {
+  display: flex;
+  padding-bottom: 24px;
+}
+
+.project-page .project-info .tabs article.tabs-panel .project-detail section.pd-base .pd-lf {
+  flex: 1;
+}
+
+.project-page .project-info .tabs article.tabs-panel .project-detail section.pd-base .pd-lf .pd-lf__info-container {
+  display: flex;
+}
+
+.project-page .project-info .tabs article.tabs-panel .project-detail section.pd-base .pd-lf .pd-lf__info-container > span {
+  width: 60px;
+  height: 60px;
+  margin-right: 12px;
+}
+
+.project-page .project-info .tabs article.tabs-panel .project-detail section.pd-base .pd-lf .pd-lf__info-container .info-container {
+  flex: 1;
+  margin-bottom: 24px;
+}
+
+.project-page .project-info .tabs article.tabs-panel .project-detail section.pd-base .pd-lf .pd-lf__info-container .info-container h3 {
+  font-size: 18px;
+  line-height: 18px;
+  color: #000;
+  margin-bottom: 6px;
+}
+
+.project-page .project-info .tabs article.tabs-panel .project-detail section.pd-base .pd-lf .pd-lf__info-container .info-container p {
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 12px;
+  line-height: 16px;
+  margin-bottom: 4px;
+}
+
+.project-page .project-info .tabs article.tabs-panel .project-detail section.pd-base .pd-lf button + button {
+  margin-left: 12px;
+}
+
+.project-page .project-info .tabs article.tabs-panel .project-detail section.pd-base .pd-rt {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.project-page .project-info .tabs article.tabs-panel .project-detail section.pd-base .pd-rt button {
+  padding: 0;
+  width: 100px;
+  margin-bottom: 6px;
+  position: relative;
+}
+
+.project-page .project-info .tabs article.tabs-panel .project-detail section.pd-more {
+  padding: 24px 0;
+}
+
+.project-page .project-info .tabs article.tabs-panel .project-detail section.pd-more .fields-section h4 {
+  display: flex;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  color: #000;
+}
+
+.project-page .project-info .tabs article.tabs-panel .project-detail section.pd-more .fields-section .field-item {
+  display: flex;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 16px;
+  margin-top: 12px;
+}
+
+.project-page .project-info .tabs article.tabs-panel .project-detail section.pd-more .fields-section .field-item span:first-child {
+  width: 80px;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.project-page .project-info .tabs article.tabs-panel .project-detail section.pd-more .fields-section + .fields-section {
+  margin-top: 28px;
+}
+
+.project-page .project-info .tabs article#config-tab {
+  padding: 0;
+  background: #eff1f2;
+  /* 配置面板内部自己滚，外层不滚（否则会出现两层滚动条） */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --------------------------- 全页拖放浮层 --------------------------- */
+
+.project-page-uploader {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background-color: rgba(236, 244, 244, 0.6);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.project-page-uploader-content {
+  width: 600px;
+  height: 300px;
+  background: rgba(53, 221, 142, 0.08);
+  border: 3px dashed #35dd8e;
+  border-radius: 12px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  color: #35dd8e;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+/* ============================== import page ============================== */
+
+.import-page {
+  flex: 1 1 auto;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+
+.import-page .file-uploader {
+  width: 50%;
+  height: 180px;
+  border: 1px dashed rgba(0, 0, 0, 0.4);
+  border-radius: 12px;
+  margin-top: 157px;
+}
+
+.import-page .file-uploader .file-uploader__tips {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  text-align: -webkit-center;
+  margin-top: 38px;
+  color: rgba(0, 0, 0, 0.4);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.import-page .file-uploader .file-uploader__tips .icon-plus {
+  display: block;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.import-page .file-uploader .file-uploader__btns {
+  margin-top: 16px;
+}
+
+.import-page .file-uploader .file-uploader__btns .icon-sm {
+  margin-right: 5px;
+  display: inline-block;
+}
+
+.import-page .file-uploader.active {
+  border-color: #35dd8e;
+  background: linear-gradient(0deg, rgba(51, 221, 142, 0.08), rgba(51, 221, 142, 0.08));
+}
+
+.import-page .file-uploader.active .file-uploader__tips {
+  color: #35dd8e;
+}
+
+.import-page .file-uploader.active .file-uploader__btns {
+  opacity: 0.5;
+}
+
+/* ------------------------------ 项目列表 ------------------------------ */
+
+.file-uploader-dir {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1 1 auto;
+}
+
+.file-uploader-dir .search-bar {
+  flex: 0 0 auto;
+}
+
+.file-uploader-dir .search-bar .search-input {
+  background: rgba(5, 15, 35, 0.04);
+  border-radius: 4px;
+  height: 32px;
+  margin: 0 16px;
+  padding: 0 12px;
+  position: relative;
+}
+
+.file-uploader-dir .search-bar .search-input input {
+  background: transparent;
+  border: none;
+  width: 100%;
+  height: 100%;
+  color: rgba(0, 0, 0, 0.3);
+  caret-color: rgba(0, 0, 0, 0.3);
+  font-size: 14px;
+  cursor: text;
+}
+
+.file-uploader-dir .search-bar .search-input input::-webkit-input-placeholder {
+  color: rgba(0, 0, 0, 0.3);
+  font-size: 14px;
+  line-height: 32px;
+}
+
+.file-uploader-dir .search-bar .search-input i {
+  position: absolute;
+  right: 16px;
+  top: 10px;
+}
+
+.file-uploader-dir .search-bar .btn-containers {
+  display: flex;
+  margin: 12px 16px 0 16px;
+  padding-bottom: 16px;
+  border-bottom: solid 0.5px rgba(5, 15, 35, 0.08);
+}
+
+.file-uploader-dir .search-bar .btn-containers > div {
+  flex: 1;
+  text-align: center;
+}
+
+.file-uploader-dir .search-bar .btn-containers .text-btn {
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 20px;
+  color: #35dd8e;
+  position: relative;
+  padding-left: 17px;
+
+  display: flex;
+}
+
+.file-uploader-dir .search-bar .btn-containers .text-btn i {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  cursor: pointer;
+}
+
+.file-uploader-dir .search-bar .btn-containers .text-btn:hover,
+.file-uploader-dir .search-bar .btn-containers .text-btn:active {
+  opacity: 0.8;
+}
+
+.file-uploader-dir .history {
+  padding: 16px 0;
+  flex: 1 1 auto;
+  overflow: auto;
+}
+
+.file-uploader-dir .history .text-btn.clear-history {
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 14px;
+  color: rgba(0, 0, 0, 0.3);
+  position: relative;
+  padding-right: 12px;
+  margin-left: 16px;
+}
+
+.file-uploader-dir .history .text-btn.clear-history i {
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  right: 0;
+  top: 2px;
+}
+
+.file-uploader-dir .history .history-list {
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.file-uploader-dir .history .history-item {
+  display: flex;
+  align-items: center;
+  padding: 20px 16px;
+  cursor: pointer;
+}
+
+.file-uploader-dir .history .history-item .picon {
+  width: 36px;
+  height: 36px;
+  margin-right: 8px;
+}
+
+.file-uploader-dir .history .history-item .pinfo {
+  flex: 1;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.file-uploader-dir .history .history-item .pinfo h4 {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 18px;
+  color: #000;
+  margin-bottom: 2px;
+  cursor: pointer;
+  display: flex;
+}
+
+.file-uploader-dir .history .history-item .pinfo span {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: block;
+  cursor: pointer;
+}
+
+.file-uploader-dir .history .history-item .icon-delete {
+  opacity: 0;
+  margin-left: 2px;
+  cursor: pointer;
+}
+
+.file-uploader-dir .history .history-item:hover {
+  background: rgba(5, 15, 35, 0.03);
+}
+
+.file-uploader-dir .history .history-item:hover .icon-delete {
+  opacity: 1;
+}
+
+.file-uploader-dir .history .history-item.active {
+  background: rgba(51, 221, 142, 0.05);
+}
+
+/* 键盘移动到的位置：左侧一条绿色指示条，与「当前已打开项目」的淡绿底区分开 */
+.file-uploader-dir .history .history-item.focused {
+  position: relative;
+}
+
+.file-uploader-dir .history .history-item.focused::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: #35dd8e;
+}
+
+.file-uploader-dir .history .history-item:not(:last-child) {
+  border-bottom: solid 0.5px rgba(5, 15, 35, 0.08);
+}
+
+/* 空态：区分「没有项目」与「搜索无结果」（原版这里是空白） */
+.file-uploader-dir .history .history-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 40px 24px;
+  color: rgba(5, 15, 35, 0.35);
+  text-align: center;
+}
+
+.file-uploader-dir .history .history-empty h4 {
+  margin: 6px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(5, 15, 35, 0.55);
+}
+
+.file-uploader-dir .history .history-empty p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+  max-width: 240px;
+}
+
+/* ====================== config panel（可视化 + JSON） ====================== */
+
+.config-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  background: #eff1f2;
+}
+
+/* 顶部切换条：可视化 / JSON / 分屏 */
+.config-panel .config-switch {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  border-bottom: 0.5px solid rgba(5, 15, 35, 0.08);
+  background: #fff;
+}
+
+.config-panel .config-switch .switch-btn {
+  border: 0;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 12px;
+  line-height: 24px;
+  padding: 0 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.config-panel .config-switch .switch-btn:hover {
+  background: rgba(5, 15, 35, 0.05);
+}
+
+.config-panel .config-switch .switch-btn[aria-selected="true"] {
+  background: rgba(53, 221, 142, 0.14);
+  color: #0d7a52;
+  font-weight: 600;
+}
+
+.config-panel .config-switch .switch-spacer {
+  flex: 1 1 auto;
+}
+
+/* JSON 不合法时的提示 */
+.config-panel .config-switch .switch-warning {
+  font-size: 12px;
+  color: #d97706;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.config-panel .config-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+}
+
+.config-panel .config-body > * {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* 分屏时中间加一条分隔线 */
+.config-panel .config-body.is-split > * + * {
+  border-left: 0.5px solid rgba(5, 15, 35, 0.1);
+}
+
+/* 配置面板内部的滚动容器（可视化表单 / JSON 编辑器）沿用与 .tabs-panel 一致的细滚动条。
+   全局 `::-webkit-scrollbar-thumb` 是品牌绿 #35dd8e（base.css，来自原版设计）——
+   在代码编辑器里一条 3px 亮绿常驻滚动条很像渲染故障，也和相邻的 .tabs-panel 不一致。 */
+.config-panel ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.config-panel ::-webkit-scrollbar-thumb {
+  background: rgba(5, 15, 35, 0.18);
+  border: 3px solid transparent;
+  border-radius: 5px;
+  background-clip: content-box;
+}
+
+.config-panel ::-webkit-scrollbar-thumb:hover {
+  background: rgba(5, 15, 35, 0.3);
+  background-clip: content-box;
+}
+
+/* ---------------------------- 可视化表单 ---------------------------- */
+
+.config-form {
+  height: 100%;
+  overflow-y: auto;
+  padding: 16px 20px 24px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.config-form .cf-group + .cf-group {
+  margin-top: 22px;
+}
+
+.config-form .cf-group > h4 {
+  margin: 0 0 10px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(5, 15, 35, 0.45);
+  font-weight: 600;
+}
+
+.config-form .cf-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.config-form .cf-row > label {
+  flex: 0 0 118px;
+  font-size: 12.5px;
+  color: rgba(0, 0, 0, 0.62);
+  line-height: 26px;
+  text-align: right;
+}
+
+.config-form .cf-row .cf-control {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.config-form .cf-row input[type="text"],
+.config-form .cf-row input[type="number"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 26px;
+  padding: 0 8px;
+  font-size: 12.5px;
+  border: 1px solid rgba(5, 15, 35, 0.16);
+  border-radius: 5px;
+  background: #fff;
+  color: #0b1220;
+  outline: none;
+}
+
+.config-form .cf-row input:focus {
+  border-color: #35dd8e;
+  box-shadow: 0 0 0 2px rgba(53, 221, 142, 0.16);
+}
+
+.config-form .cf-row input.cf-mono {
+  font-family: Menlo, Consolas, "Courier New", monospace;
+  font-size: 12px;
+}
+
+/* 图标实时预览：与输入框同高（26px），避免把行撑高；加载失败时组件会把它摘掉 */
+.config-form .cf-row .cf-icon-preview {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  padding: 1px;
+  object-fit: contain;
+  border: 1px solid rgba(5, 15, 35, 0.12);
+  border-radius: 5px;
+  background: #fff;
+}
+
+.config-form .cf-row .cf-unit {
+  font-size: 11.5px;
+  color: rgba(5, 15, 35, 0.4);
+}
+
+/* 提示文字挂在 .cf-group 下（.cf-row 的兄弟节点），**不是** .cf-row 的子节点，
+   所以选择器不能带 .cf-row —— 否则整条规则不命中，
+   <p> 会落到浏览器默认字号（16px），在一堆 12.5px 的表单里显得像标题。 */
+.config-form .cf-hint {
+  font-size: 11.5px;
+  color: rgba(5, 15, 35, 0.35);
+  line-height: 16px;
+  margin-top: -4px;
+  margin-bottom: 8px;
+  /* 118px 标签列 + 10px 间距，跟控件列左边缘对齐 */
+  padding-left: 128px;
+}
+
+.config-form .cf-check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: rgba(0, 0, 0, 0.62);
+  cursor: pointer;
+  user-select: none;
+}
+
+.config-form .cf-check input {
+  margin: 0;
+  accent-color: #35dd8e;
+}
+
+.config-form .cf-mini-btn {
+  flex: 0 0 auto;
+  border: 1px solid rgba(5, 15, 35, 0.16);
+  background: #fff;
+  border-radius: 5px;
+  height: 26px;
+  padding: 0 10px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.62);
+  cursor: pointer;
+}
+
+.config-form .cf-mini-btn:hover {
+  border-color: #35dd8e;
+  color: #0d7a52;
+}
+
+.config-form .cf-invalid {
+  margin: 0;
+  padding: 40px 24px;
+  text-align: center;
+  color: #d97706;
+  font-size: 12.5px;
+  line-height: 20px;
+}
+
+/* ---------------------------- JSON 编辑器 ---------------------------- */
+
+.options-editor {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
+.options-editor .options-editor-body {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.options-editor footer {
+  flex: 0 0 auto;
+  background: white;
+  padding: 8px 16px;
+  box-sizing: border-box;
+  border-top: 0.5px solid rgba(5, 15, 35, 0.08);
+}
+
+.options-editor footer .btn {
+  font-size: 14px;
+  line-height: 18px;
+  padding: 0 28px;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.options-editor footer .btn.btn-primary {
+  color: #fff;
+}
+
+.options-editor footer .btn-disabled {
+  cursor: not-allowed;
+  background-color: rgb(187, 191, 196);
+  color: #fff;
+}
+
+.options-editor footer .btn-disabled:hover {
+  opacity: 1;
+}
+
+/* ================================= modals ================================ */
+
+.modal-container {
+  position: fixed;
+  z-index: 9998;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  border-radius: 8px;
+}
+
+.modal {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-active {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.modal .window {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  width: 340px;
+  background: white;
+  border: 0.5px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  padding: 16px 20px;
+  position: relative;
+}
+
+.modal .window i.icon-close {
+  position: absolute;
+  right: 24px;
+  top: 20px;
+  width: 10px;
+  height: 10px;
+  cursor: pointer;
+}
+
+.modal .window .window-body {
+  width: 100%;
+  overflow: unset;
+  display: block;
+  flex: 1;
+  word-break: break-all;
+  margin-top: 0;
+}
+
+.modal .window .window-body h4 {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.modal .window .window-body p {
+  max-height: 300px;
+  overflow: auto;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 18px;
+  margin-top: 12px;
+}
+
+.modal .window .window-body.progress h4,
+.modal .window .window-body.progress p {
+  text-align: center;
+}
+
+.modal .window .window-body.progress p {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.modal .window .window-body.progress .progressbar {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(5, 15, 35, 0.04);
+  margin-top: 16px;
+  padding: 0 4px;
+}
+
+.modal .window .window-body.progress .progressbar .progressbar-animated {
+  background-color: #35dd8e;
+  border-radius: 4px;
+  height: 100%;
+  transition: width 0.1s ease-in-out;
+}
+
+.modal .window footer {
+  flex: 0;
+  margin-top: 32px;
+}

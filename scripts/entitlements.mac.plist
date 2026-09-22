@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- V8 需要 JIT，没有这一条 Chromium 会在启动阶段直接退出 -->
+  <key>com.apple.security.cs.allow-jit</key>
+  <true/>
+
+  <!-- Chromium 会申请可写可执行内存 -->
+  <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+  <true/>
+
+  <!-- 允许通过 DYLD_* 注入，Electron 的开发期行为依赖它 -->
+  <key>com.apple.security.cs.allow-dyld-environment-variables</key>
+  <true/>
+
+  <!-- Electron Framework 与 Helper 之间不是同一 Team 签名，必须放宽库校验 -->
+  <key>com.apple.security.cs.disable-library-validation</key>
+  <true/>
+</dict>
+</plist>
